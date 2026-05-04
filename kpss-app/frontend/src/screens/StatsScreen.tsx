@@ -19,7 +19,8 @@ export default function StatsScreen() {
     try {
       const res = await api.get<WeeklySummary[]>('/daily-stats/weekly');
       setData(res.data);
-    } catch {
+    } catch (error) {
+      console.error('Error loading weekly stats:', error);
       Alert.alert('Hata', 'Haftalık veri yüklenemedi.');
     } finally {
       setLoading(false);
@@ -51,31 +52,40 @@ export default function StatsScreen() {
       <Text style={styles.title}>Haftalık İstatistik</Text>
       <Text style={styles.subtitle}>Son 7 gün — toplam {totalSolved} soru</Text>
 
-      <BarChart
-        data={chartData}
-        width={screenWidth - 32}
-        height={220}
-        yAxisLabel=""
-        yAxisSuffix=""
-        chartConfig={{
-          backgroundColor: '#4f46e5',
-          backgroundGradientFrom: '#4f46e5',
-          backgroundGradientTo: '#7c3aed',
-          decimalPlaces: 0,
-          color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-          labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-        }}
-        style={styles.chart}
-        showValuesOnTopOfBars
-      />
-
-      {/* Tarih bazlı detay listesi */}
-      {data.map((d) => (
-        <View key={d.date} style={styles.row}>
-          <Text style={styles.rowDate}>{d.date}</Text>
-          <Text style={styles.rowValue}>{d.total_solved} soru</Text>
+      {data.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>Henüz veri bulunmuyor</Text>
+          <Text style={styles.emptySubtext}>Soru çözdükçe burada grafik görünecek</Text>
         </View>
-      ))}
+      ) : (
+        <>
+          <BarChart
+            data={chartData}
+            width={screenWidth - 32}
+            height={220}
+            yAxisLabel=""
+            yAxisSuffix=""
+            chartConfig={{
+              backgroundColor: '#4f46e5',
+              backgroundGradientFrom: '#4f46e5',
+              backgroundGradientTo: '#7c3aed',
+              decimalPlaces: 0,
+              color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+              labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            }}
+            style={styles.chart}
+            showValuesOnTopOfBars
+          />
+
+          {/* Tarih bazlı detay listesi */}
+          {data.map((d) => (
+            <View key={d.date} style={styles.row}>
+              <Text style={styles.rowDate}>{d.date}</Text>
+              <Text style={styles.rowValue}>{d.total_solved} soru</Text>
+            </View>
+          ))}
+        </>
+      )}
     </ScrollView>
   );
 }
@@ -87,6 +97,9 @@ const styles = StyleSheet.create({
   title: { fontSize: 22, fontWeight: 'bold', marginBottom: 4 },
   subtitle: { color: '#666', marginBottom: 16 },
   chart: { borderRadius: 12, marginBottom: 20 },
+  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingVertical: 60 },
+  emptyText: { fontSize: 18, color: '#666', marginBottom: 8 },
+  emptySubtext: { fontSize: 14, color: '#999' },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',

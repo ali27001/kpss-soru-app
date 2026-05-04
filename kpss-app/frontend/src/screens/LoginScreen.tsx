@@ -16,6 +16,7 @@ import { saveToken } from '../storage/auth';
 type NavProp = NativeStackNavigationProp<any>;
 
 export default function LoginScreen() {
+  console.log('LoginScreen rendered');
   const navigation = useNavigation<NavProp>();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -29,15 +30,22 @@ export default function LoginScreen() {
 
     setLoading(true);
     try {
+      console.log('Login: Sending request...');
       const response = await api.post('/auth/login', { username, password });
+      console.log('Login: Response received:', response.data);
       await saveToken(response.data.token);
+      console.log('Login: Token saved');
       // Giriş başarılı → ana sekmelere yönlendir, geri dönüş olmasın
+      console.log('Login: Navigating to App...');
       navigation.reset({ index: 0, routes: [{ name: 'App' }] });
+      console.log('Login: Navigation reset called');
     } catch (error: any) {
+      console.error('Login: Error:', error);
+      console.error('Login: Error response:', error.response);
       if (error.response?.status === 401) {
         Alert.alert('Hata', 'Kullanıcı adı veya şifre hatalı.');
       } else {
-        Alert.alert('Hata', 'Giriş sırasında bir sorun oluştu.');
+        Alert.alert('Hata', 'Giriş sırasında bir sorun oluştu. Detay: ' + (error.message || 'Bilinmeyen hata'));
       }
     } finally {
       setLoading(false);

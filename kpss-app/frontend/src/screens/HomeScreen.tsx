@@ -28,7 +28,6 @@ export default function HomeScreen() {
 
   const today = getTodayStr();
 
-  // Ders listesini ve bugünkü mevcut kayıtları paralel çek
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
@@ -39,7 +38,6 @@ export default function HomeScreen() {
 
       setSubjects(subjectList);
 
-      // Mevcut kayıtları input alanlarına önceden doldur
       const initialInputs: Record<number, StatInput> = {};
       subjectList.forEach((s) => {
         const existing = existingStats.find((e: any) => e.subject_id === s.id);
@@ -98,7 +96,13 @@ export default function HomeScreen() {
       <Text style={styles.title}>Günlük Soru Girişi</Text>
       <Text style={styles.date}>{today}</Text>
 
-      {subjects.map((subject) => (
+      {subjects.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>Henüz ders eklenmemiş</Text>
+          <Text style={styles.emptySubtext}>Admin panelinden ders ekleyebilirsiniz</Text>
+        </View>
+      ) : (
+        subjects.map((subject) => (
         <View key={subject.id} style={styles.card}>
           <Text style={styles.subjectName}>{subject.name}</Text>
           <View style={styles.row}>
@@ -134,7 +138,8 @@ export default function HomeScreen() {
             </View>
           </View>
         </View>
-      ))}
+      ))
+      )}
 
       <TouchableOpacity style={styles.button} onPress={handleSave} disabled={saving}>
         {saving ? (
@@ -182,4 +187,21 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: '#999',
+    textAlign: 'center',
+  },
 });

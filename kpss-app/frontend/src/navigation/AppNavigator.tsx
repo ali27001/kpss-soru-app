@@ -25,22 +25,19 @@ function AppTabs() {
 }
 
 export default function AppNavigator() {
-  const [initialRoute, setInitialRoute] = useState<string | null>(null);
+  console.log('AppNavigator component rendered');
+  const [initialRoute, setInitialRoute] = useState<string>('Login'); // Default olarak Login
 
   // Uygulama açılırken token kontrolü — varsa direkt App'e yönlendir
   useEffect(() => {
+    console.log('AppNavigator useEffect triggered');
     getToken().then((token) => {
+      console.log('AppNavigator: Token exists:', !!token);
       setInitialRoute(token ? 'App' : 'Login');
     });
   }, []);
 
-  if (!initialRoute) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#4f46e5" />
-      </View>
-    );
-  }
+  console.log('AppNavigator: initialRoute:', initialRoute);
 
   return (
     <NavigationContainer>
