@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DatabaseModule } from './database/database.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { DatabaseModule } from './database/database.module';
       synchronize: true, // Geliştirme ortamı için, production'da false yapılmalı
     }),
     DatabaseModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
