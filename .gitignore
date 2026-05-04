@@ -1,0 +1,9 @@
+# Kiro spec dosyaları
+.kiro/
+
+# IDE
+.vscode/
+.idea/
+
+# Log
+*.log
