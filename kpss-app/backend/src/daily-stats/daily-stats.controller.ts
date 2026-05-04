@@ -20,4 +20,11 @@ export class DailyStatsController {
   findByDate(@Request() req: any, @Query('date') date: string) {
     return this.dailyStatsService.findByDate(req.user.userId, date);
   }
+
+  // GET /daily-stats/weekly — son 7 günlük özet
+  // ÖNEMLİ: Bu route @Get() 'den önce tanımlanmalı, aksi halde "weekly" date param olarak yorumlanır
+  @Get('weekly')
+  getWeekly(@Request() req: any) {
+    return this.dailyStatsService.getWeeklySummary(req.user.userId);
+  }
 }

@@ -42,4 +42,25 @@ export class DailyStatsService {
       where: { user_id: userId, date },
     });
   }
+
+  // Son 7 güne ait toplam çözülen soru sayısını döner
+  // Veri olmayan günler için total_solved: 0 olarak doldurulur
+  async getWeeklySummary(userId: number): Promise<{ date: string; total_solved: number }[]> {
+    const result: { date: string; total_solved: number }[] = [];
+
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0]; // YYYY-MM-DD
+
+      const stats = await this.dailyStatRepository.find({
+        where: { user_id: userId, date: dateStr },
+      });
+
+      const total = stats.reduce((sum, s) => sum + Number(s.solved_count), 0);
+      result.push({ date: dateStr, total_solved: total });
+    }
+
+    return result;
+  }
 }
