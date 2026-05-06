@@ -30,14 +30,25 @@ export default function HomeScreen() {
 
   const loadData = useCallback(async () => {
     setLoading(true);
+    console.log('HomeScreen: Veriler yükleniyor...');
+    
     try {
-      const [subjectList, existingStats] = await Promise.all([
-        getSubjects(),
-        api.get(`/daily-stats?date=${today}`).then((r) => r.data),
-      ]);
-
+      // 1. Dersleri çek (JWT gerektirmez)
+      const subjectList = await getSubjects();
       setSubjects(subjectList);
+      console.log('HomeScreen: Dersler yüklendi:', subjectList.length);
 
+      // 2. İstatistikleri çek (JWT gerektirir)
+      let existingStats = [];
+      try {
+        const statsRes = await api.get(`/daily-stats?date=${today}`);
+        existingStats = statsRes.data;
+        console.log('HomeScreen: Mevcut istatistikler yüklendi:', existingStats.length);
+      } catch (statsError: any) {
+        console.warn('HomeScreen: İstatistikler çekilemedi (401?), devam ediliyor...', statsError.message);
+      }
+
+      // 3. Inputları doldur
       const initialInputs: Record<number, StatInput> = {};
       subjectList.forEach((s) => {
         const existing = existingStats.find((e: any) => e.subject_id === s.id);
@@ -47,12 +58,15 @@ export default function HomeScreen() {
         };
       });
       setInputs(initialInputs);
-    } catch {
-      Alert.alert('Hata', 'Veriler yüklenemedi.');
+    } catch (error: any) {
+      console.error('HomeScreen: Kritik yükleme hatası:', error);
+      Alert.alert('Hata', 'Ders listesi yüklenemedi. Lütfen internet bağlantınızı kontrol edin.');
     } finally {
       setLoading(false);
     }
   }, [today]);
+
+
 
   useEffect(() => {
     loadData();

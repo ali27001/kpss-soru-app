@@ -3,18 +3,30 @@ import { getToken, removeToken } from '../storage/auth';
 
 // Tüm API istekleri bu instance üzerinden yapılır
 const api = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: 'http://192.168.88.232:3000',
   timeout: 10000,
 });
 
 // Request interceptor: her isteğe AsyncStorage'dan okunan JWT'yi ekler
 api.interceptors.request.use(async (config) => {
   const token = await getToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+  console.log(`API İsteği: ${config.method?.toUpperCase()} ${config.url} - Token mevcut mu: ${!!token}`);
+  
+  if (token && config.headers) {
+    // Axios 1.x için en güvenli yöntemler
+    if (typeof config.headers.set === 'function') {
+      config.headers.set('Authorization', `Bearer ${token}`);
+    } else {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
   }
   return config;
+}, (error) => {
+  console.error('API İstek Hatası:', error);
+  return Promise.reject(error);
 });
+
+
 
 // Response interceptor: 401 gelince token'ı sil
 // Navigasyon burada yapılamaz (hook dışında), ekranlar kendi 401 yönetimini yapar
