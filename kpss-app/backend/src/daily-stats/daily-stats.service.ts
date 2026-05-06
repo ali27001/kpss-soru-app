@@ -63,4 +63,16 @@ export class DailyStatsService {
 
     return result;
   }
+
+  async remove(userId: number, id: number): Promise<void> {
+    const stat = await this.dailyStatRepository.findOne({
+      where: { id, user_id: userId },
+    });
+    if (!stat) {
+      throw new BadRequestException('Kayıt bulunamadı veya silme yetkiniz yok');
+    }
+    await this.dailyStatRepository.remove(stat);
+  }
 }
+
+

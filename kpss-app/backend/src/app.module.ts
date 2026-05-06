@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { SubjectsModule } from './subjects/subjects.module';
@@ -7,15 +8,22 @@ import { DailyStatsModule } from './daily-stats/daily-stats.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432'),
-      username: process.env.DB_USER || 'postgres',
-      password: process.env.DB_PASS || 'postgres',
-      database: process.env.DB_NAME || 'kpss_db',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, // Geliştirme ortamı için, production'da false yapılmalı
+    ConfigModule.forRoot({
+      isGlobal: true, // Tüm modüllerde erişilebilir yapar
+    }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get<string>('DB_HOST', 'localhost'),
+        port: configService.get<number>('DB_PORT', 5432),
+        username: configService.get<string>('DB_USER', 'postgres'),
+        password: configService.get<string>('DB_PASS', 'postgres'),
+        database: configService.get<string>('DB_NAME', 'kpss_db'),
+        autoLoadEntities: true,
+        synchronize: true,
+      }),
+      inject: [ConfigService],
     }),
     DatabaseModule,
     AuthModule,
@@ -25,4 +33,10 @@ import { DailyStatsModule } from './daily-stats/daily-stats.module';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+
+export class AppModule {
+  constructor() {
+    console.log(`Veritabanı bağlantısı deneniyor: ${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || '5432'}`);
+  }
+}
+

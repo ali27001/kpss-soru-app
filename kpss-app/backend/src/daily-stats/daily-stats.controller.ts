@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Query, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Get, Delete, Body, Query, Param, UseGuards, Request, HttpCode, HttpStatus } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { DailyStatsService } from './daily-stats.service';
 import { CreateDailyStatDto } from './dto/create-daily-stat.dto';
@@ -27,4 +27,12 @@ export class DailyStatsController {
   getWeekly(@Request() req: any) {
     return this.dailyStatsService.getWeeklySummary(req.user.userId);
   }
+
+  // DELETE /daily-stats/:id — kaydı sil
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  remove(@Request() req: any, @Param('id') id: string) {
+    return this.dailyStatsService.remove(req.user.userId, +id);
+  }
 }
+
