@@ -40,8 +40,10 @@ export class DailyStatsService {
   findByDate(userId: number, date: string): Promise<DailyStat[]> {
     return this.dailyStatRepository.find({
       where: { user_id: userId, date },
+      relations: ['subject'],
     });
   }
+
 
   // Son 7 güne ait toplam çözülen soru sayısını döner
   // Veri olmayan günler için total_solved: 0 olarak doldurulur
