@@ -14,15 +14,36 @@ import { getToken } from '../storage/auth';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+import { Ionicons } from '@expo/vector-icons';
+
 function AppTabs() {
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName: any;
+
+          if (route.name === 'Ana Ekran') {
+            iconName = focused ? 'home' : 'home-outline';
+          } else if (route.name === 'Takvim') {
+            iconName = focused ? 'calendar' : 'calendar-outline';
+          } else if (route.name === 'İstatistik') {
+            iconName = focused ? 'bar-chart' : 'bar-chart-outline';
+          }
+
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: '#4f46e5',
+        tabBarInactiveTintColor: 'gray',
+      })}
+    >
       <Tab.Screen name="Ana Ekran" component={HomeScreen} />
       <Tab.Screen name="Takvim" component={CalendarScreen} />
       <Tab.Screen name="İstatistik" component={StatsScreen} />
     </Tab.Navigator>
   );
 }
+
 
 export default function AppNavigator() {
   console.log('AppNavigator component rendered');

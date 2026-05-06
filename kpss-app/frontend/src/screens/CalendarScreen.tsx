@@ -9,6 +9,7 @@ interface DailyStat {
   date: string;
   solved_count: number;
   net: number;
+  subject?: { name: string };
 }
 
 // react-native-calendars'ın beklediği işaretli günler formatı
@@ -103,7 +104,7 @@ export default function CalendarScreen() {
             <Text style={styles.dateTitle}>{selectedDate}</Text>
             {stats.map((s) => (
               <View key={s.id} style={styles.statRow}>
-                <Text style={styles.statSubject}>Ders #{s.subject_id}</Text>
+                <Text style={styles.statSubject}>{s.subject?.name || `Ders #${s.subject_id}`}</Text>
                 <Text style={styles.statValue}>Çözülen: {s.solved_count}</Text>
                 <Text style={styles.statValue}>Net: {s.net}</Text>
               </View>
