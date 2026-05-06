@@ -9,8 +9,10 @@ import { DailyStatsModule } from './daily-stats/daily-stats.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      isGlobal: true, // Tüm modüllerde erişilebilir yapar
+      isGlobal: true,
+      envFilePath: '.env', // Dosya yolunu netleştiriyoruz
     }),
+
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
